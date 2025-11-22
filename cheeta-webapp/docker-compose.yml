@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cheeta-postgres
+    environment:
+      POSTGRES_DB: cheeta
+      POSTGRES_USER: cheeta
+      POSTGRES_PASSWORD: cheeta
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cheeta"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: cheeta-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  onedev:
+    image: 1dev/server:latest
+    container_name: cheeta-onedev
+    ports:
+      - "6610:6610"
+      - "6611:6611"
+    volumes:
+      - onedev_data:/opt/onedev
+    environment:
+      - hibernate_dialect=io.onedev.server.persistence.PostgreSQLDialect
+      - hibernate_connection_driver_class=org.postgresql.Driver
+      - hibernate_connection_url=jdbc:postgresql://postgres:5432/onedev
+      - hibernate_connection_username=cheeta
+      - hibernate_connection_password=cheeta
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
+  onedev_data:
