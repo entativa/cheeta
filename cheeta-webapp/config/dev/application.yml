@@ -1,0 +1,90 @@
+spring:
+  application:
+    name: cheeta-webapp
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cheeta
+    username: cheeta
+    password: ${DB_PASSWORD:cheeta}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  
+  security:
+    user:
+      name: admin
+      password: ${ADMIN_PASSWORD:admin}
+  
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+server:
+  port: 8080
+  compression:
+    enabled: true
+  http2:
+    enabled: true
+
+vaadin:
+  launch-browser: true
+  close-idle-sessions: true
+  heartbeat-interval: 300
+
+cheeta:
+  onedev:
+    url: ${ONEDEV_URL:http://localhost:6610}
+    api-key: ${ONEDEV_API_KEY:}
+  
+  ai:
+    enabled: true
+    provider: ${AI_PROVIDER:openai}
+    openai:
+      api-key: ${OPENAI_API_KEY:}
+      model: gpt-4
+      max-tokens: 2000
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY:}
+      model: claude-3-sonnet-20240229
+      max-tokens: 4000
+  
+  security:
+    jwt:
+      secret: ${JWT_SECRET:your-secret-key-change-this-in-production}
+      expiration: 86400000
+  
+  storage:
+    max-repo-size: 5368709120
+    max-file-size: 104857600
+
+logging:
+  level:
+    root: INFO
+    io.cheeta: DEBUG
+    org.springframework.web: DEBUG
+    com.vaadin: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
